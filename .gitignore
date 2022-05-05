@@ -5,6 +5,7 @@
 .cache*
 .classpath
 .idea
+.bsp
 .project
 .settings
 /bin/

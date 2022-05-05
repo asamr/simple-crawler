@@ -1,4 +1,0 @@
-[0m[[0m[31merror[0m] [0m[0m/Users/alexander.samartsev/Documents/git/crawler/src/main/scala/simple/crawler/Domain.scala:19:50: could not find Lazy implicit value of type io.circe.generic.encoding.DerivedAsObjectEncoder[simple.crawler.Domain.TitleEntity][0m
-[0m[[0m[31merror[0m] [0m[0m    implicit val encoder: Encoder[TitleEntity] = deriveEncoder[0m
-[0m[[0m[31merror[0m] [0m[0m                                                 ^[0m
-[0m[[0m[31merror[0m] [0m[0mone error found[0m
