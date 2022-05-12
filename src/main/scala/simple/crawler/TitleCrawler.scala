@@ -2,8 +2,10 @@ package simple.crawler
 
 import cats.effect.{Concurrent, Sync}
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser
-import fs2.Stream
 import Domain.TitleEntity
+import cats.Parallel
+import cats.implicits.catsSyntaxParallelTraverse1
+
 import scala.util.Try
 
 trait TitleCrawler[F[_]] {
@@ -15,24 +17,19 @@ trait TitleCrawler[F[_]] {
 object TitleCrawler {
   type Title = String
 
-  def apply[F[_]]()(implicit C: Concurrent[F], S: Sync[F]): TitleCrawler[F] = new TitleCrawler[F] {
-    private val browser = new JsoupBrowser()
+  def apply[F[_]]()(implicit C: Concurrent[F], S: Sync[F], P: Parallel[F]): TitleCrawler[F] = new TitleCrawler[F] { // TODO: Resource?
+    private val browser = JsoupBrowser.typed()
 
-    override def crawlUrl(url: String): F[TitleEntity] =
-      S.delay {
+    override def crawlUrl(url: String): F[TitleEntity] = {
+      S.blocking {
         val title = Try {
           browser.get(url).title
         }.toEither
 
         TitleEntity(url, title)
       }
+    }
 
-    override def crawlUrls(urls: List[String]): F[List[TitleEntity]] =
-      Stream
-        .emits(urls)
-        .covary[F]
-        .parEvalMap(Config.availableCores * 2)(crawlUrl)
-        .compile
-        .toList
+    override def crawlUrls(urls: List[String]): F[List[TitleEntity]] = urls.parTraverse(crawlUrl)
   }
 }
